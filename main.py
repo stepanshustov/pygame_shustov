@@ -240,6 +240,14 @@ if __name__ == '__main__':
 
                             player, x_pos, y_pos = gen_lev(v_)
 
+            if state == "died":
+                if event.type == pygame.VIDEORESIZE:  # изменение размеров окна и размеров всех объектов
+                    old_size = size
+                    width, height = pygame.display.get_surface().get_size()
+                    width = max(width, MINWIDTH)
+                    height = max(height, MINHEIGHT)
+                    size = width, height
+
         clock.tick(50)
         screen.fill('#000000')
         if state == "start_window":
