@@ -122,6 +122,7 @@ if __name__ == '__main__':
     buttons = list()  # список всех кнопок
     buttons.append(Button("play", width * 0.4, height * 0.4, 150, 60, text="Play", sh=50))
     orig_fon = load_image('fon.jpg')
+    game_over_image = load_image('game_over.jpg')
     fon = pygame.transform.scale(orig_fon, (width, height))  # задний фон игры
     while running:
         cnt_an = min(30, cnt_an + 1)
@@ -201,6 +202,8 @@ if __name__ == '__main__':
                     level_map[x_pos][y_pos] = '@'
                     if moving_enemies(x_pos, y_pos) == "died":
                         health.delete()
+                        for el in all_sprites:
+                            el.kill()
                         all_sprites = MySpritesGroup()
                         state = "died"
 
@@ -230,6 +233,8 @@ if __name__ == '__main__':
                             cnt_an = 0
                             if moving_enemies(x_pos, y_pos) == "died":
                                 health.delete()
+                                for el in all_sprites:
+                                    el.kill()
                                 all_sprites = MySpritesGroup()
                                 state = "died"
 
@@ -250,5 +255,6 @@ if __name__ == '__main__':
                     if level_map[k][j] != '#':
                         pygame.draw.rect(screen, 'white',
                                          (LEFT + j * cell_size, TOP + k * cell_size, cell_size, cell_size), 1)
+        if state == "died":
 
         pygame.display.flip()
