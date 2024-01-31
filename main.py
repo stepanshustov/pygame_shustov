@@ -127,6 +127,8 @@ if __name__ == '__main__':
     orig_fon = load_image('fon.jpg')
     game_over_image = load_image('game_over.jpg')
     game_over_fon = game_over_image
+    win_image = load_image('win.png')
+    win_fon = win_image
     fon = pygame.transform.scale(orig_fon, (width, height))  # задний фон игры
     while running:
         cnt_an = min(30, cnt_an + 1)
@@ -146,6 +148,27 @@ if __name__ == '__main__':
                 fon = pygame.transform.scale(orig_fon, (width, height))
                 screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for i in range(len(buttons)):
+                    if buttons[i].check_click(*event.pos):
+                        if buttons[i].name == "close":
+                            state = "select_level"
+                            buttons = []
+                            all_sprites = MySpritesGroup()
+                            cnt = 0
+                            for row in range(height // 100):
+                                if cnt > 10:
+                                    break
+                                for col in range(width // 100):
+                                    cnt += 1
+                                    if cnt > 10:
+                                        break
+                                    buttons.append(Button(f'level:{cnt}',
+                                                          col * 100 + 40, (row + 1) * 100,
+                                                          90, 90,
+                                                          '#ffffff', f"{cnt}",
+                                                          "#ffffff", 30))
+
             if state == "start_window":
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -156,9 +179,13 @@ if __name__ == '__main__':
                                 buttons = []
                                 all_sprites = MySpritesGroup()
                                 cnt = 0
-                                for row in range(2):
-                                    for col in range(10):
+                                for row in range(height // 100):
+                                    if cnt > 10:
+                                        break
+                                    for col in range(width // 100):
                                         cnt += 1
+                                        if cnt > 10:
+                                            break
                                         buttons.append(Button(f'level:{cnt}',
                                                               col * 100 + 40, (row + 1) * 100,
                                                               90, 90,
@@ -182,6 +209,10 @@ if __name__ == '__main__':
                                     player, x_pos, y_pos = gen_lev()
                                     health = Health(3)
                                     state = "level_go"
+                                    buttons = []
+                                    buttons.append(
+                                        Button("close", width * 0.5, 10, 150, 70, text="close", color_rect="yellow",
+                                               sh=70))
                                 except Exception as ex:
                                     print("file not find or error:\n", ex)
 
@@ -226,9 +257,15 @@ if __name__ == '__main__':
                             for el in all_sprites:
                                 el.kill()
                             all_sprites = MySpritesGroup()
+                            win_rect = win_image.get_rect()
+                            mn = min(height / win_rect.h, width / win_rect.w) - 0.1
+                            win_fon = pygame.transform.scale(win_image,
+                                                             (a := int(win_rect.w * mn),
+                                                              b := int(win_rect.h * mn)))
                             buttons = []
                             buttons.append(
-                                Button("close", a // 2.5, b + 200, 300, 120, text="close", color_rect="blue", sh=100))
+                                Button("close", a // 2.5, b + 100, 300, 120, text="close", color_rect="blue", sh=100))
+                            break
 
                 if event.type == pygame.VIDEORESIZE:  # изменение размеров окна и размеров всех объектов
                     player, x_pos, y_pos = gen_lev(v_)
@@ -246,6 +283,22 @@ if __name__ == '__main__':
                             player, x_pos, y_pos = gen_lev(v_)
                             if player == "win":
                                 state = "win"
+                                health.delete()
+                                for el in all_sprites:
+                                    el.kill()
+                                all_sprites = MySpritesGroup()
+                                win_rect = win_image.get_rect()
+                                mn = min(height / win_rect.h, width / win_rect.w) - 0.1
+
+                                win_fon = pygame.transform.scale(win_image,
+                                                                 (a := int(win_rect.w * mn),
+                                                                  b := int(win_rect.h * mn)))
+                                buttons = []
+                                buttons.append(
+                                    Button("close", a // 2.5, b + 100, 300, 120, text="close", color_rect="blue",
+                                           sh=100))
+                                break
+
                             player.cnt = 0
                             player.state = "attack"
                             cnt_an = 0
@@ -267,6 +320,21 @@ if __name__ == '__main__':
                                 player, x_pos, y_pos = gen_lev(v_)
                                 if player == "win":
                                     state = "win"
+                                    health.delete()
+                                    for el in all_sprites:
+                                        el.kill()
+                                    all_sprites = MySpritesGroup()
+                                    win_rect = win_image.get_rect()
+                                    mn = min(height / win_rect.h, width / win_rect.w) - 0.1
+
+                                    win_fon = pygame.transform.scale(win_image,
+                                                                     (a := int(win_rect.w * mn),
+                                                                      b := int(win_rect.h * mn)))
+                                    buttons = []
+                                    buttons.append(
+                                        Button("close", a // 2.5, b + 100, 300, 120, text="close", color_rect="blue",
+                                               sh=100))
+                                    break
 
             if state == "died":
                 if event.type == pygame.VIDEORESIZE:  # изменение размеров окна и размеров всех объектов
@@ -289,7 +357,10 @@ if __name__ == '__main__':
                         pygame.draw.rect(screen, 'white',
                                          (LEFT + j * cell_size, TOP + k * cell_size, cell_size, cell_size), 1)
         if state == "died":
-            screen.blit(game_over_fon, (20, 100))
+            screen.blit(game_over_fon, (50, 50))
+        if state == "win":
+            screen.blit(win_fon, (20, 100))
+
         draw_buttons(buttons, screen)  # отрисовка всех кнопок
 
         pygame.display.flip()

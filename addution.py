@@ -2,7 +2,7 @@ import pygame
 import os
 
 LEFT = 30
-TOP = 200
+TOP = 100
 
 
 def load_level(filename):
