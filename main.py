@@ -8,6 +8,8 @@ from queue import Queue
 MINWIDTH = 800
 MINHEIGHT = 450
 
+print("примечание, было реализовано только 4 уровня, это не ошибка, пустые кнопки только для демонстрации ".upper())
+
 
 def moving_enemies(x, y):
     global health
