@@ -13,20 +13,23 @@ def moving_enemies(x, y):
     global health
     global state
     levmp_cop = []
-    for i in range(len(level_map)):
-        levmp_cop.append(level_map[i].copy())
-    for i in range(len(level_map)):
-        for j in range(len(level_map[i])):
-            if levmp_cop[i][j] == 'p':
-                levmp_cop[i][j] = '.'
-                tx, ty = bfs((i, j), (x, y))
-                if tx != -1 and ty != -1:
-                    level_map[tx][ty] = 'p'
-                    level_map[i][j] = '.'
-                if tx == x and ty == y:
-                    level_map[tx][ty] = '@'
-                    if not health.minus():
-                        return "died"
+    for i in range(20):
+        for i in range(len(level_map)):
+            levmp_cop.append(level_map[i].copy())
+        for i in range(len(level_map)):
+            for j in range(len(level_map[i])):
+                if levmp_cop[i][j] == 'p':
+                    levmp_cop[i][j] = '.'
+                    if j == 18:
+                        pass
+                    tx, ty = bfs((i, j), (x, y))
+                    if tx != -1 and ty != -1:
+                        level_map[tx][ty] = 'p'
+                        level_map[i][j] = '.'
+                    if tx == x and ty == y:
+                        level_map[tx][ty] = '@'
+                        if not health.minus():
+                            return "died"
 
 
 def bfs(start: tuple, finish: tuple):
@@ -38,42 +41,42 @@ def bfs(start: tuple, finish: tuple):
     while q.qsize():
         cnt += 1
         v = q.get()
-        if v[0] + 1 < h_l and dist[v[0] + 1][v[1]] == 10000 and level_map[v[0] + 1][v[1]] == '.':
+        if v[0] + 1 < h_l and dist[v[0] + 1][v[1]] == 10000 and level_map[v[0] + 1][v[1]] != '#':
             q.put((v[0] + 1, v[1]))
             dist[v[0] + 1][v[1]] = dist[v[0]][v[1]] + 1
 
-        if v[0] - 1 >= 0 and dist[v[0] - 1][v[1]] == 10000 and level_map[v[0] - 1][v[1]] == '.':
+        if v[0] - 1 >= 0 and dist[v[0] - 1][v[1]] == 10000 and level_map[v[0] - 1][v[1]] != '#':
             q.put((v[0] - 1, v[1]))
             dist[v[0] - 1][v[1]] = dist[v[0]][v[1]] + 1
 
-        if v[1] + 1 < w_l and dist[v[0]][v[1] + 1] == 10000 and level_map[v[0]][v[1] + 1] == '.':
+        if v[1] + 1 < w_l and dist[v[0]][v[1] + 1] == 10000 and level_map[v[0]][v[1] + 1] != '#':
             q.put((v[0], v[1] + 1))
             dist[v[0]][v[1] + 1] = dist[v[0]][v[1]] + 1
 
-        if v[1] - 1 > 0 and dist[v[0]][v[1] - 1] == 10000 and level_map[v[0]][v[1] - 1] == '.':
+        if v[1] - 1 > 0 and dist[v[0]][v[1] - 1] == 10000 and level_map[v[0]][v[1] - 1] != '#':
             q.put((v[0], v[1] - 1))
             dist[v[0]][v[1] - 1] = dist[v[0]][v[1]] + 1
 
         if dist[start[0]][start[1]] != 10000:
             break
     res = (-1, -1)
-    if start[0] - 1 >= 0:
+    if start[0] - 1 >= 0 and level_map[start[0] - 1][start[1]] in ('.', '@'):
         res = (start[0] - 1, start[1])
-    elif start[1] - 1 >= 0:
+    elif start[1] - 1 >= 0 and level_map[start[0]][start[1] - 1] in ('.', '@'):
         res = (start[0], start[1] - 1)
-    elif start[0] + 1 < h_l:
+    elif start[0] + 1 < h_l and level_map[start[0] + 1][start[1]] in ('.', '@'):
         res = (start[0] + 1, start[1])
-    else:
+    elif start[1] + 1 < w_l and level_map[start[0]][start[1] + 1] in ('.', '@'):
         res = (start[0], start[1] + 1)
-
-    if start[0] - 1 >= 0 and dist[start[0] - 1][start[1]] < dist[res[0]][res[1]]:
-        res = (start[0] - 1, start[1])
-    if start[1] - 1 >= 0 and dist[start[0]][start[1] - 1] < dist[res[0]][res[1]]:
-        res = (start[0], start[1] - 1)
-    if start[0] + 1 < h_l and dist[start[0] + 1][start[1]] < dist[res[0]][res[1]]:
-        res = (start[0] + 1, start[1])
-    if start[1] + 1 < w_l and dist[start[0]][start[1] + 1] < dist[res[0]][res[1]]:
-        res = (start[0], start[1] + 1)
+    if res != (-1, -1):
+        if start[0] - 1 >= 0 and dist[start[0] - 1][start[1]] < dist[res[0]][res[1]]:
+            res = (start[0] - 1, start[1])
+        if start[1] - 1 >= 0 and dist[start[0]][start[1] - 1] < dist[res[0]][res[1]]:
+            res = (start[0], start[1] - 1)
+        if start[0] + 1 < h_l and dist[start[0] + 1][start[1]] < dist[res[0]][res[1]]:
+            res = (start[0] + 1, start[1])
+        if start[1] + 1 < w_l and dist[start[0]][start[1] + 1] < dist[res[0]][res[1]]:
+            res = (start[0], start[1] + 1)
 
     return res
 

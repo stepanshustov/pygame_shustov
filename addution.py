@@ -216,5 +216,8 @@ class Health:
             self.sprites.pop().kill()
 
 
+
+
+
 if __name__ == '__main__':
     print(load_level("map1.map"))
