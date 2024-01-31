@@ -122,19 +122,48 @@ if __name__ == '__main__':
     x_pos = y_pos = -1
     size_lev = w_lev, h_lev = -1, -1
     cell_size = 60
+    health = Health(0)
     buttons = list()  # список всех кнопок
-    buttons.append(Button("play", width * 0.4, height * 0.4, 150, 60, text="Play", sh=50))
+
     orig_fon = load_image('fon.jpg')
     game_over_image = load_image('game_over.jpg')
     game_over_fon = game_over_image
     win_image = load_image('win.png')
     win_fon = win_image
     fon = pygame.transform.scale(orig_fon, (width, height))  # задний фон игры
+    st = ["-1", "-1"]
+    with open("data/last.txt", "r", encoding='utf-8') as fil:
+        st = fil.readlines()
+        if st[0].split(':')[0] == "health":
+            health = Health(int(st[0].strip().rstrip().split(':')[1]))
+            st.pop(0)
+        else:
+            st = ["-1"]
+    if st[0] != "-1":
+        with open("data/last.txt", "w", encoding='utf-8') as fil:
+            for el in st:
+                print(el.strip(), file=fil)
+        level_map = load_level("last.txt")
+        state = "level_go"
+        player, x_pos, y_pos = gen_lev()
+        buttons.append(
+            Button("close", width * 0.5, 10, 150, 70, text="close", color_rect="yellow",
+                   sh=70))
+        with open("data/last.txt", "w", encoding='utf-8') as fil:
+            print(-1, file=fil)
+    else:
+        buttons.append(Button("play", width * 0.4, height * 0.4, 150, 60, text="Play", sh=50))
     while running:
-        cnt_an = min(30, cnt_an + 1)
+        # cnt_an = min(30, cnt_an + 1)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                if health.hp > 0:
+                    with open("data/last.txt", "w", encoding='utf-8') as fil:
+                        print(f"health:{health.hp}", file=fil)
+                        for i in range(len(level_map)):
+                            print(*level_map[i], sep='', file=fil)
                 running = False
+                break
             if cnt_an < 30:
                 continue
             if event.type == pygame.VIDEORESIZE:  # изменение размеров окна и размеров всех объектов
@@ -152,6 +181,9 @@ if __name__ == '__main__':
                 for i in range(len(buttons)):
                     if buttons[i].check_click(*event.pos):
                         if buttons[i].name == "close":
+                            with open("data/last.txt", "w", encoding='utf-8') as fil:
+                                print(-1, file=fil)
+                            health = Health(0)
                             state = "select_level"
                             buttons = []
                             all_sprites = MySpritesGroup()
@@ -164,10 +196,10 @@ if __name__ == '__main__':
                                     if cnt > 10:
                                         break
                                     buttons.append(Button(f'level:{cnt}',
-                                                          col * 100 + 40, (row + 1) * 100,
+                                                          col * 100 + 110, (row + 1) * 100,
                                                           90, 90,
                                                           '#ffffff', f"{cnt}",
-                                                          "#ffffff", 30))
+                                                          "#ffffff", 60))
 
             if state == "start_window":
 
@@ -187,10 +219,10 @@ if __name__ == '__main__':
                                         if cnt > 10:
                                             break
                                         buttons.append(Button(f'level:{cnt}',
-                                                              col * 100 + 40, (row + 1) * 100,
+                                                              col * 100 + 110, (row + 1) * 100,
                                                               90, 90,
                                                               '#ffffff', f"{cnt}",
-                                                              "#ffffff", 30))
+                                                              "#ffffff", 60))
 
                             break
 
@@ -301,7 +333,7 @@ if __name__ == '__main__':
 
                             player.cnt = 0
                             player.state = "attack"
-                            cnt_an = 0
+                            # cnt_an = 0
                             if moving_enemies(x_pos, y_pos) == "died":
                                 health.delete()
                                 for el in all_sprites:
@@ -347,6 +379,12 @@ if __name__ == '__main__':
         screen.fill('#000000')
         if state == "start_window":
             screen.blit(fon, (0, 0))
+        if state == "select_level":
+            font = pygame.font.Font(None, height // 10)
+            text = font.render("Select a level:", True, "green")
+            text_w = text.get_width()
+            text_h = text.get_height()
+            screen.blit(text, (10, 10))
         all_sprites.draw(screen)
         all_sprites.update(state)
         if state == "level_go":
