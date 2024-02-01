@@ -382,8 +382,14 @@ if __name__ == '__main__':
 
         clock.tick(50)
         screen.fill('#000000')
+        # if state != "level_go":
+        screen.blit(fon, (0, 0))
         if state == "start_window":
-            screen.blit(fon, (0, 0))
+            font = pygame.font.Font(None, height // 15 + width // 15)
+            text = font.render("Beat the ghosts", True, "green")
+            text_w = text.get_width()
+            text_h = text.get_height()
+            screen.blit(text, (width // 6, 50))
         if state == "select_level":
             font = pygame.font.Font(None, height // 10)
             text = font.render("Select a level:", True, "green")
@@ -393,6 +399,7 @@ if __name__ == '__main__':
         all_sprites.draw(screen)
         all_sprites.update(state)
         if state == "level_go":
+
             health.update(screen)
             for k in range(len(level_map)):
                 for j in range(len(level_map[k])):
@@ -400,8 +407,10 @@ if __name__ == '__main__':
                         pygame.draw.rect(screen, 'white',
                                          (LEFT + j * cell_size, TOP + k * cell_size, cell_size, cell_size), 1)
         if state == "died":
+            screen.fill('#000000')
             screen.blit(game_over_fon, (50, 50))
         if state == "win":
+            screen.fill('#000000')
             screen.blit(win_fon, (20, 100))
 
         draw_buttons(buttons, screen)  # отрисовка всех кнопок
