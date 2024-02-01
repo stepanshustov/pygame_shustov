@@ -309,6 +309,7 @@ if __name__ == '__main__':
                         else:
                             continue
                     level_map[lx][ly] = '.'
+
                     level_map[x_pos][y_pos] = '@'
                     if moving_enemies(x_pos, y_pos) == "died":
                         health.delete()
