@@ -381,6 +381,7 @@ if __name__ == '__main__':
                                                            (int(game_over_rect.w * mn), int(game_over_rect.h * mn)))
 
         clock.tick(50)
+
         screen.fill('#000000')
         # if state != "level_go":
         screen.blit(fon, (0, 0))
