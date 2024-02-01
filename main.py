@@ -19,17 +19,30 @@ def moving_enemies(x, y):
     global health
     global state
     levmp_cop = []
+    for i in range(len(level_map)):
+        levmp_cop.append(level_map[i].copy())
+
+    for i in range(max(0, x - 2), min(len(level_map), x + 3)):
+        for j in range(max(0, y - 2), min(len(level_map[i]), y + 3)):
+            if levmp_cop[i][j] == 'p':
+                tx, ty = bfs((i, j), (x, y))
+                if tx != -1 and ty != -1:
+                    levmp_cop[i][j] = '.'
+                    level_map[tx][ty] = 'p'
+                    level_map[i][j] = '.'
+                if tx == x and ty == y:
+                    level_map[tx][ty] = '@'
+                    if not health.minus():
+                        return "died"
+
     for i in range(20):
-        for i in range(len(level_map)):
-            levmp_cop.append(level_map[i].copy())
+
         for i in range(len(level_map)):
             for j in range(len(level_map[i])):
                 if levmp_cop[i][j] == 'p':
-                    levmp_cop[i][j] = '.'
-                    if j == 18:
-                        pass
                     tx, ty = bfs((i, j), (x, y))
                     if tx != -1 and ty != -1:
+                        levmp_cop[i][j] = '.'
                         level_map[tx][ty] = 'p'
                         level_map[i][j] = '.'
                     if tx == x and ty == y:
@@ -47,19 +60,19 @@ def bfs(start: tuple, finish: tuple):
     while q.qsize():
         cnt += 1
         v = q.get()
-        if v[0] + 1 < h_l and dist[v[0] + 1][v[1]] == 10000 and level_map[v[0] + 1][v[1]] != '#':
+        if v[0] + 1 < h_l and dist[v[0] + 1][v[1]] == 10000 and level_map[v[0] + 1][v[1]] in ('.', '@'):
             q.put((v[0] + 1, v[1]))
             dist[v[0] + 1][v[1]] = dist[v[0]][v[1]] + 1
 
-        if v[0] - 1 >= 0 and dist[v[0] - 1][v[1]] == 10000 and level_map[v[0] - 1][v[1]] != '#':
+        if v[0] - 1 >= 0 and dist[v[0] - 1][v[1]] == 10000 and level_map[v[0] - 1][v[1]] in ('.', '@'):
             q.put((v[0] - 1, v[1]))
             dist[v[0] - 1][v[1]] = dist[v[0]][v[1]] + 1
 
-        if v[1] + 1 < w_l and dist[v[0]][v[1] + 1] == 10000 and level_map[v[0]][v[1] + 1] != '#':
+        if v[1] + 1 < w_l and dist[v[0]][v[1] + 1] == 10000 and level_map[v[0]][v[1] + 1] in ('.', '@'):
             q.put((v[0], v[1] + 1))
             dist[v[0]][v[1] + 1] = dist[v[0]][v[1]] + 1
 
-        if v[1] - 1 > 0 and dist[v[0]][v[1] - 1] == 10000 and level_map[v[0]][v[1] - 1] != '#':
+        if v[1] - 1 > 0 and dist[v[0]][v[1] - 1] == 10000 and level_map[v[0]][v[1] - 1] in ('.', '@'):
             q.put((v[0], v[1] - 1))
             dist[v[0]][v[1] - 1] = dist[v[0]][v[1]] + 1
 
@@ -156,8 +169,8 @@ if __name__ == '__main__':
         state = "level_go"
         player, x_pos, y_pos = gen_lev()
         buttons.append(
-            Button("close", width * 0.5, 10, 150, 70, text="close", color_rect="yellow",
-                   sh=70))
+            Button("close", width * 0.5, 10, width // 8.5, height // 11, text="close", color_rect="yellow",
+                   sh=height // 10))
         with open("data/last.txt", "w", encoding='utf-8') as fil:
             print(-1, file=fil)
     else:
@@ -258,8 +271,9 @@ if __name__ == '__main__':
                                     state = "level_go"
                                     buttons = []
                                     buttons.append(
-                                        Button("close", width * 0.5, 10, 150, 70, text="close", color_rect="yellow",
-                                               sh=70))
+                                        Button("close", width * 0.5, 10, width // 8.5, height // 11, text="close",
+                                               color_rect="yellow",
+                                               sh=height // 10))
                                 except Exception as ex:
                                     print("file not find or error:\n", ex)
 
@@ -267,22 +281,34 @@ if __name__ == '__main__':
 
             if state == "level_go":
                 if event.type == pygame.KEYDOWN:
+                    lx, ly = x_pos, y_pos
 
-                    level_map[x_pos][y_pos] = '.'
                     if event.key == pygame.K_UP or event.key == pygame.K_w:
                         if is_go(level_map, x_pos - 1, y_pos):
                             x_pos -= 1
+                        else:
+                            continue
                     elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                         if is_go(level_map, x_pos + 1, y_pos):
                             x_pos += 1
+                        else:
+                            continue
                     elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                         v_ = 0
+                        player, x_pos, y_pos = gen_lev(v_)
                         if is_go(level_map, x_pos, y_pos - 1):
                             y_pos -= 1
+                        else:
+                            continue
                     elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                         v_ = 1
+                        player, x_pos, y_pos = gen_lev(v_)
+
                         if is_go(level_map, x_pos, y_pos + 1):
                             y_pos += 1
+                        else:
+                            continue
+                    level_map[lx][ly] = '.'
                     level_map[x_pos][y_pos] = '@'
                     if moving_enemies(x_pos, y_pos) == "died":
                         health.delete()

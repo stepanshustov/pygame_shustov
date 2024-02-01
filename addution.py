@@ -3,7 +3,7 @@ import os
 import sqlite3
 
 LEFT = 30
-TOP = 100
+TOP = 140
 
 
 class Sql:
@@ -212,11 +212,11 @@ class Health:
         self.max_hp = mx
         self.sprites = []
         for i in range(n):
-            self.sprites.append(Tile('heart', i * 45 + 20, 10, self.spr_gr, 50))
+            self.sprites.append(Tile('heart', i * 70 + 20, 10, self.spr_gr, 75))
 
     def plus(self):
         self.hp = min(self.max_hp, self.hp + 1)
-        self.sprites.append(Tile('heart', self.hp * 45 - 25, 10, self.spr_gr, 50))
+        self.sprites.append(Tile('heart', self.hp * 70 - 25, 10, self.spr_gr, 75))
 
     def minus(self):
         self.hp -= 1
