@@ -10,6 +10,10 @@ MINHEIGHT = 450
 
 print("примечание, было реализовано только 4 уровня, это не ошибка, пустые кнопки только для демонстрации ".upper())
 
+sql = Sql()
+
+levs = sql.get_levs()
+
 
 def moving_enemies(x, y):
     global health
@@ -200,11 +204,14 @@ if __name__ == '__main__':
                                     cnt += 1
                                     if cnt > 10:
                                         break
+                                    color_t = "white"
+                                    if cnt in levs:
+                                        color_t = "yellow"
                                     buttons.append(Button(f'level:{cnt}',
                                                           col * 100 + 110, (row + 1) * 100,
                                                           90, 90,
                                                           '#ffffff', f"{cnt}",
-                                                          "#ffffff", 60))
+                                                          color_t, 60))
 
             if state == "start_window":
 
@@ -223,11 +230,14 @@ if __name__ == '__main__':
                                         cnt += 1
                                         if cnt > 10:
                                             break
+                                        color_t = "white"
+                                        if cnt in levs:
+                                            color_t = "yellow"
                                         buttons.append(Button(f'level:{cnt}',
                                                               col * 100 + 110, (row + 1) * 100,
                                                               90, 90,
                                                               '#ffffff', f"{cnt}",
-                                                              "#ffffff", 60))
+                                                              color_t, 60))
 
                             break
 
@@ -289,6 +299,8 @@ if __name__ == '__main__':
                     else:
                         player, x_pos, y_pos = gen_lev(v_)
                         if player == "win":
+                            sql.add_lev(level)
+                            levs.append(level)
                             state = "win"
                             health.delete()
                             for el in all_sprites:
@@ -320,6 +332,8 @@ if __name__ == '__main__':
                             player, x_pos, y_pos = gen_lev(v_)
                             if player == "win":
                                 state = "win"
+                                sql.add_lev(level)
+                                levs.append(level)
                                 health.delete()
                                 for el in all_sprites:
                                     el.kill()
@@ -357,6 +371,8 @@ if __name__ == '__main__':
                                 player, x_pos, y_pos = gen_lev(v_)
                                 if player == "win":
                                     state = "win"
+                                    sql.add_lev(level)
+                                    levs.append(level)
                                     health.delete()
                                     for el in all_sprites:
                                         el.kill()

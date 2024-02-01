@@ -1,8 +1,26 @@
 import pygame
 import os
+import sqlite3
 
 LEFT = 30
 TOP = 100
+
+
+class Sql:
+    def __init__(self):
+        self.con = sqlite3.connect("databese.sqlite")
+        self.cur = self.con.cursor()
+
+    def add_lev(self, n: int):
+        try:
+            self.cur.execute(f"INSERT INTO main (lev) VALUES ({n})")
+            self.con.commit()
+            return True
+        except Exception:
+            return False
+
+    def get_levs(self):
+        return [el[0] for el in self.cur.execute("SELECT * FROM main").fetchall()]
 
 
 def load_level(filename):
@@ -214,9 +232,6 @@ class Health:
         self.hp = 0
         while len(self.sprites):
             self.sprites.pop().kill()
-
-
-
 
 
 if __name__ == '__main__':
